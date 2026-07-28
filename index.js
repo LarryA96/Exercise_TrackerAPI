@@ -81,7 +81,6 @@ app.get("/api/users/:_id/logs", (req, res)=>{
 	let from = req.query.from;
 	let to = req.query.to;
 	let limit = parseInt(req.query.limit);
-	const hasLimit = !isNaN(limit);
 	
 	
 	if (from) {
