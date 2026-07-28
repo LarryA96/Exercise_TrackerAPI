@@ -99,11 +99,10 @@ for (const exercise of log) {
     exercise.date = exercise.date.toDateString();
 }
 
-res.json({
-    ...users[index],
-    count: log.length,
-    log
-});
+Object.assign(userObject, {count: log.length,
+    log});
+
+res.json(userObject);
 	
 });
 
