@@ -84,27 +84,65 @@ app.get("/api/users/:_id/logs", (req, res)=>{
 	const hasLimit = !isNaN(limit);
 	
 	
-	if (from) {
-    log = log.filter(e => formatDate(e.date) >= from);
-}
-
-if (to) {
-    log = log.filter(e => formatDate(e.date) <= to);
-}
-
-if (hasLimit) {
-    log = log.slice(0, limit);
-}
-
-for (const exercise of log) {
-    exercise.date = exercise.date.toDateString();
-}
-
-res.json({
-    ...users[index],
-    count: log.length,
-    log: log
-});
+	if (from && to && hasLimit){
+		log = log.filter((logObject)=> formatDate(logObject.date) >= from && formatDate(logObject.date) <= to);
+		log = log.slice(0, limit);
+		for (let object of log){
+			object.date = object.date.toDateString();
+		}
+		Object.assign(userObject, {count: log.length, log: log});
+	res.json(userObject);
+	} else if (from && to){
+		log = log.filter((logObject)=> formatDate(logObject.date) >= from && formatDate(logObject.date) <= to);
+		for (let object of log){
+			object.date = object.date.toDateString();
+		}
+		Object.assign(userObject, {count: log.length, log: log});
+	res.json(userObject);
+	} else if (from && hasLimit){
+		log = log.filter((logObject)=> formatDate(logObject.date) >= from);
+		log = log.slice(0, limit);
+		for (let object of log){
+			object.date = object.date.toDateString();
+		}
+		Object.assign(userObject, {count: log.length, log: log});
+	res.json(userObject);
+	} else if (to && hasLimit){
+		log = log.filter((logObject)=> formatDate(logObject.date) <= to);
+		log = log.slice(0, limit);
+		for (let object of log){
+			object.date = object.date.toDateString();
+		}
+		Object.assign(userObject, {count: log.length, log: log});
+	res.json(userObject);
+	} else if (from){
+		log = log.filter((logObject)=> formatDate(logObject.date) >= from);
+		for (let object of log){
+			object.date = object.date.toDateString();
+		}
+		Object.assign(userObject, {count: log.length, log: log});
+	res.json(userObject);
+	} else if (to){
+		log = log.filter((logObject)=> formatDate(logObject.date) <= to);
+		Object.assign(userObject, {count: log.length, log: log});
+		for (let object of log){
+			object.date = object.date.toDateString();
+		}
+	res.json(userObject);
+	} else if (hasLimit){
+		log = log.slice(0, limit);
+		for (let object of log){
+			object.date = object.date.toDateString();
+		}
+		Object.assign(userObject, {count: log.length, log: log});
+	res.json(userObject);
+	} else {
+		for (let object of log){
+			object.date = object.date.toDateString();
+		}
+		Object.assign(userObject, {count: log.length, log: log});
+	res.json(userObject);
+	}
 	
 });
 
