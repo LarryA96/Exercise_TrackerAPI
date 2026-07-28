@@ -3,11 +3,8 @@ const app = express()
 const cors = require('cors')
 require('dotenv').config()
 
-//Import body parser for post requests
-const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json())
-
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
 app.use(cors())
 app.use(express.static('public'))
@@ -24,7 +21,13 @@ const logs = [];
 
 //Use post request to create new user and log record
 app.post("/api/users", (req, res)=>{
+    
 	let user = {username : req.body.username, _id : String(users.length+1)};
+	/*let existingUser = users.find(user => user.username === req.body.username);
+
+    if (existingUser) {
+        return res.json({ error: "username already exists" });
+    }*/
 	users.push(user);
 	logs.push([]);
 	console.log(users);
@@ -42,7 +45,7 @@ app.post('/api/users/:_id/exercises', (req, res)=>{
 	
 	//Process date and return error if invalid
 	let date;
-	if (req.body.date == ""){
+	if (!req.body.date){
 		date = new Date();
 	} else if (!/^\d{4}-\d{2}-\d{2}$/.test(req.body.date)){
 		return res.json({error: "invalid date"});
@@ -56,6 +59,11 @@ app.post('/api/users/:_id/exercises', (req, res)=>{
 	
 	//Grab index from id and create exercise object
 	let index = parseInt(req.params._id) - 1;
+	
+	if (!users[index]) {
+    return res.json({error: "user not found"});
+}
+	
 	let exercises = {description: req.body.description,
 					 duration: parseInt(req.body.duration),
 					 date: date};
@@ -67,14 +75,19 @@ app.post('/api/users/:_id/exercises', (req, res)=>{
 	let userExercise = {...users[index]};
 	Object.assign(userExercise, exercises);
 	userExercise.date = date.toDateString();
+	console.log(`exercise date is ${userExercise.date}`)
 	res.json(userExercise);
 	
-	console.log(logs);
+	console.log(userExercise);
 });
 
+//Get request to pull specific user logs
 app.get("/api/users/:_id/logs", (req, res)=>{
 	//Create index from user id
 	let index = parseInt(req.params._id) - 1;
+	if (!users[index]) {
+    return res.json({error: "user not found"});
+}
 	
 	//Create user log for display
 	let log = logs[index].map(exercise => ({...exercise}));
@@ -85,12 +98,14 @@ app.get("/api/users/:_id/logs", (req, res)=>{
 	let to = req.query.to;
 	let limit = parseInt(req.query.limit);
 	
+	console.log(from);
 	
-	if (from) {
+	
+	if (from != undefined) {
     log = log.filter(e => formatDate(e.date) >= from);
 }
 
-if (to) {
+if (to != undefined) {
     log = log.filter(e => formatDate(e.date) <= to);
 }
 
@@ -98,18 +113,15 @@ if (!isNaN(limit)) {
     log = log.slice(0, limit);
 }
 
-for (const exercise of log) {
-    exercise.date = exercise.date.toDateString();
-}
-console.log([{
-    ...users[index],
-    count: count,
-    log
-}]);
+log = log.map(exercise => ({
+    ...exercise,
+    date: exercise.date.toDateString()
+}));
 
 res.json({
-    ...users[index],
+    username: users[index].username,
     count: count,
+    _id: users[index]._id,
     log
 });
 	
