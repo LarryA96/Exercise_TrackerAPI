@@ -75,7 +75,6 @@ app.get("/api/users/:_id/logs", (req, res)=>{
 	
 	//Create user log for display
 	let log = logs[index].map(exercise => ({...exercise}));
-	let userObject = {...users[index]};
 	
 	//Create variables for the optional parameters
 	let from = req.query.from;
@@ -99,10 +98,11 @@ for (const exercise of log) {
     exercise.date = exercise.date.toDateString();
 }
 
-Object.assign(userObject, {count: log.length,
-    log});
-
-res.json(userObject);
+res.json({
+    ...users[index],
+    count: log.length,
+    log
+});
 	
 });
 
