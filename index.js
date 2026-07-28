@@ -41,7 +41,7 @@ app.post('/api/users/:_id/exercises', (req, res)=>{
 	
 	//Process date and return error if invalid
 	let date;
-	if (req.body.date = ""){
+	if (req.body.date == ""){
 		date = new Date();
 	} else if (!/^\d{4}-\d{2}-\d{2}$/.test(req.body.date)){
 		return res.json({error: "invalid date"});
@@ -92,7 +92,7 @@ if (to) {
     log = log.filter(e => formatDate(e.date) <= to);
 }
 
-if (!isNaN(limit)) {
+if (hasLimit) {
     log = log.slice(0, limit);
 }
 
