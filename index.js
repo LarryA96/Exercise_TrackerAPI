@@ -74,7 +74,7 @@ app.get("/api/users/:_id/logs", (req, res)=>{
 	let index = parseInt(req.params._id) - 1;
 	
 	//Create user log for display
-	let log = logs[index];
+	let log = {...logs[index]};
 	let userObject = {...users[index]};
 	
 	//Create variables for the optional parameters
