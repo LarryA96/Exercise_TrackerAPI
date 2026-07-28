@@ -24,7 +24,7 @@ const logs = [];
 
 //Use post request to create new user and log record
 app.post("/api/users", (req, res)=>{
-	let user = {username : req.body.username, _id : users.length+1};
+	let user = {username : req.body.username, _id : String(users.length+1)};
 	users.push(user);
 	logs.push([]);
 	res.json(user);
@@ -41,7 +41,7 @@ app.post('/api/users/:_id/exercises', (req, res)=>{
 	
 	//Process date and return error if invalid
 	let date;
-	if (!req.body.date){
+	if (req.body.date = ""){
 		date = new Date();
 	} else if (!/^\d{4}-\d{2}-\d{2}$/.test(req.body.date)){
 		return res.json({error: "invalid date"});
@@ -81,67 +81,30 @@ app.get("/api/users/:_id/logs", (req, res)=>{
 	let from = req.query.from;
 	let to = req.query.to;
 	let limit = parseInt(req.query.limit);
+	const hasLimit = !isNaN(limit);
 	
 	
-	if (from && to && limit){
-		log = log.filter((logObject)=> formatDate(logObject.date) >= from && formatDate(logObject.date) <= to);
-		log = log.slice(0, limit);
-		for (let object of log){
-			object.date = object.date.toDateString();
-		}
-		Object.assign(userObject, {count: log.length, log: log});
-	res.json(userObject);
-	} else if (from && to){
-		log = log.filter((logObject)=> formatDate(logObject.date) >= from && formatDate(logObject.date) <= to);
-		for (let object of log){
-			object.date = object.date.toDateString();
-		}
-		Object.assign(userObject, {count: log.length, log: log});
-	res.json(userObject);
-	} else if (from && limit){
-		log = log.filter((logObject)=> formatDate(logObject.date) >= from);
-		log = log.slice(0, limit);
-		for (let object of log){
-			object.date = object.date.toDateString();
-		}
-		Object.assign(userObject, {count: log.length, log: log});
-	res.json(userObject);
-	} else if (to && limit){
-		log = log.filter((logObject)=> formatDate(logObject.date) <= to);
-		log = log.slice(0, limit);
-		for (let object of log){
-			object.date = object.date.toDateString();
-		}
-		Object.assign(userObject, {count: log.length, log: log});
-	res.json(userObject);
-	} else if (from){
-		log = log.filter((logObject)=> formatDate(logObject.date) >= from);
-		for (let object of log){
-			object.date = object.date.toDateString();
-		}
-		Object.assign(userObject, {count: log.length, log: log});
-	res.json(userObject);
-	} else if (to){
-		log = log.filter((logObject)=> formatDate(logObject.date) <= to);
-		Object.assign(userObject, {count: log.length, log: log});
-		for (let object of log){
-			object.date = object.date.toDateString();
-		}
-	res.json(userObject);
-	} else if (limit){
-		log = log.slice(0, limit);
-		Object.assign(userObject, {count: log.length, log: log});
-		for (let object of log){
-			object.date = object.date.toDateString();
-		}
-	res.json(userObject);
-	} else {
-		for (let object of log){
-			object.date = object.date.toDateString();
-		}
-		Object.assign(userObject, {count: log.length, log: log});
-	res.json(userObject);
-	}
+	if (from) {
+    log = log.filter(e => formatDate(e.date) >= from);
+}
+
+if (to) {
+    log = log.filter(e => formatDate(e.date) <= to);
+}
+
+if (!isNaN(limit)) {
+    log = log.slice(0, limit);
+}
+
+for (const exercise of log) {
+    exercise.date = exercise.date.toDateString();
+}
+
+res.json({
+    ...users[index],
+    count: log.length,
+    log: log
+});
 	
 });
 
