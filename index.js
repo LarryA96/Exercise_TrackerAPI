@@ -41,7 +41,7 @@ app.post('/api/users/:_id/exercises', (req, res)=>{
 	
 	//Process date and return error if invalid
 	let date;
-	if (req.body.date == ""){
+	if (!req.body.date){
 		date = new Date();
 	} else if (!/^\d{4}-\d{2}-\d{2}$/.test(req.body.date)){
 		return res.json({error: "invalid date"});
@@ -74,7 +74,7 @@ app.get("/api/users/:_id/logs", (req, res)=>{
 	let index = parseInt(req.params._id) - 1;
 	
 	//Create user log for display
-	let log = [...logs[index]];
+	let log = logs[index].map(exercise => ({...exercise}));
 	let userObject = {...users[index]};
 	
 	//Create variables for the optional parameters
