@@ -27,6 +27,7 @@ app.post("/api/users", (req, res)=>{
 	let user = {username : req.body.username, _id : String(users.length+1)};
 	users.push(user);
 	logs.push([]);
+	console.log(users);
 	res.json(user);
 });
 
@@ -67,6 +68,8 @@ app.post('/api/users/:_id/exercises', (req, res)=>{
 	Object.assign(userExercise, exercises);
 	userExercise.date = date.toDateString();
 	res.json(userExercise);
+	
+	console.log(logs);
 });
 
 app.get("/api/users/:_id/logs", (req, res)=>{
@@ -98,6 +101,11 @@ if (!isNaN(limit)) {
 for (const exercise of log) {
     exercise.date = exercise.date.toDateString();
 }
+console.log([{
+    ...users[index],
+    count: count,
+    log
+}]);
 
 res.json({
     ...users[index],
